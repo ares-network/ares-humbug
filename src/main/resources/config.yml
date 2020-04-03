@@ -1,0 +1,44 @@
+mods:
+  world:
+    enabled: true
+    block_explosions: true
+    entity_block_changes: true
+    fire_spread: true
+    cobblestone_generators: true
+    bedbombs: true
+  elevator:
+    enabled: true
+  mob-stacking:
+    enabled: true
+    tag-prefix: '&ax'
+    stack-interval: 5
+    max-stack-size: 100
+    breed-cooldown: 30
+    stack-types:
+      - 'ZOMBIE'
+      - 'SKELETON'
+      - 'SPIDER'
+      - 'CAVE_SPIDER'
+      - 'COW'
+      - 'CHICKEN'
+      - 'PIG'
+      - 'RABBIT'
+      - 'SHEEP'
+  kit-limits:
+    enabled: true
+    enchantments:
+      THORNS:
+        disabled: true
+        max-level: 0
+      KNOCKBACK:
+        disabled: true
+        max-level: 0
+      ARROW_KNOCKBACK:
+        disabled: true
+        max-level: 0
+    banned-potions:
+      - '373:16452'
+      - '373:16458'
+      - '373:16456'
+      - '373:16460'
+      - '373:16428'
