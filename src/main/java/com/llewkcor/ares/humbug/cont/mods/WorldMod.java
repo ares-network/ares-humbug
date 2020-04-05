@@ -89,7 +89,7 @@ public final class WorldMod implements HumbugMod, Listener {
             return;
         }
 
-        event.setCancelled(true);
+        event.blockList().clear();
     }
 
     @EventHandler
