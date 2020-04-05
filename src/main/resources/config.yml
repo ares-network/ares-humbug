@@ -53,3 +53,5 @@ mods:
     old_health: true
     old_strength: true
     old_regen: true
+  xp:
+    enabled: true
