@@ -20,6 +20,7 @@ public final class ModManager {
         mods.add(new MobstackMod(plugin));
         mods.add(new KitMod(plugin));
         mods.add(new KnockbackMod(plugin));
+        mods.add(new PotionMod(plugin));
     }
 
     public void load() {

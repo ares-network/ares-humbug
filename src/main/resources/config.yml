@@ -48,3 +48,8 @@ mods:
     values:
       horizontal: 1.0
       vertical: 1.0
+  potions:
+    enabled: true
+    old_health: true
+    old_strength: true
+    old_regen: true
