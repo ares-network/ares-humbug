@@ -38,12 +38,12 @@ public final class KnockbackMod implements HumbugMod, Listener {
         this.enabled = false;
         this.horizontal = 1.0D;
         this.vertical = 1.0D;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
 
         this.enabled = config.getBoolean("mods.knockback.enabled");

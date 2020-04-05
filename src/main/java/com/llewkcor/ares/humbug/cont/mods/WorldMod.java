@@ -36,6 +36,8 @@ public final class WorldMod implements HumbugMod, Listener {
     public WorldMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -49,8 +51,6 @@ public final class WorldMod implements HumbugMod, Listener {
         this.firespreadDisabled = config.getBoolean("mods.world.fire_spread");
         this.cobblestoneGenDisabled = config.getBoolean("mods.world.cobblestone_generators");
         this.bedbombDisabled = config.getBoolean("mods.world.bedbombs");
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override

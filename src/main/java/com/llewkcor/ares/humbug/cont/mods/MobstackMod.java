@@ -59,10 +59,25 @@ public final class MobstackMod implements HumbugMod, Listener {
         this.plugin = plugin;
         this.stackSkip = Collections.synchronizedList(Lists.newArrayList());
         this.breedCooldowns = Maps.newConcurrentMap();
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
     public void load() {
+        if (!breedCooldowns.isEmpty()) {
+            breedCooldowns.clear();
+        }
+
+        if (!stackSkip.isEmpty()) {
+            stackSkip.clear();
+        }
+
+        if (stackTask != null) {
+            stackTask.cancel();
+            stackTask = null;
+        }
+
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
 
         this.enabled = config.getBoolean("mods.mob-stacking.enabled");
@@ -152,8 +167,6 @@ public final class MobstackMod implements HumbugMod, Listener {
 
             stackSkip.clear();
         }).repeat(stackInterval * 20L, stackInterval * 20L).run();
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override

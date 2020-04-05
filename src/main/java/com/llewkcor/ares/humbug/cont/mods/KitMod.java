@@ -42,12 +42,12 @@ public final class KitMod implements HumbugMod, Listener {
         this.plugin = plugin;
         this.potionLimits = Sets.newHashSet();
         this.enchantLimits = Sets.newHashSet();
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @SuppressWarnings("unchecked") @Override
     public void load() {
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-
         if (!enchantLimits.isEmpty()) {
             enchantLimits.clear();
         }

@@ -26,6 +26,8 @@ public final class ElevatorMod implements HumbugMod, Listener {
     public ElevatorMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -33,8 +35,6 @@ public final class ElevatorMod implements HumbugMod, Listener {
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
 
         this.enabled = config.getBoolean("mods.elevator.enabled");
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override

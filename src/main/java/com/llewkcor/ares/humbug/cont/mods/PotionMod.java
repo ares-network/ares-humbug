@@ -31,6 +31,8 @@ public final class PotionMod implements HumbugMod, Listener {
     public PotionMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -41,8 +43,6 @@ public final class PotionMod implements HumbugMod, Listener {
         this.oldHealthEnabled = config.getBoolean("mods.potions.old_health");
         this.oldRegenEnabled = config.getBoolean("mods.potions.old_regen");
         this.oldStrengthEnabled = config.getBoolean("mods.potions.old_strength");
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override

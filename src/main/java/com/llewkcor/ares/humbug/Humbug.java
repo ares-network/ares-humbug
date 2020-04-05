@@ -1,5 +1,6 @@
 package com.llewkcor.ares.humbug;
 
+import co.aikar.commands.PaperCommandManager;
 import com.llewkcor.ares.core.Ares;
 import com.llewkcor.ares.humbug.cont.ModManager;
 import lombok.Getter;
@@ -10,12 +11,18 @@ public final class Humbug extends JavaPlugin {
     @Getter protected Ares core;
     @Getter protected ModManager modManager;
 
+    @Getter protected PaperCommandManager commandManager;
+
     @Override
     public void onEnable() {
         this.core = (Ares) Bukkit.getPluginManager().getPlugin("ares-core");
         this.modManager = new ModManager(this);
+        this.commandManager = new PaperCommandManager(this);
 
         modManager.load();
+
+        // Commands
+        commandManager.registerCommand(new HumbugCommand(this));
     }
 
     @Override
