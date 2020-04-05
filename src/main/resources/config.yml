@@ -55,3 +55,78 @@ mods:
     old_regen: true
   xp:
     enabled: true
+  mining:
+    enabled: true
+    findables:
+      DIAMOND_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 3
+        max_vein: 8
+        min_spawn_height: 0
+        max_spawn_height: 16
+        odds: '1:1250'
+      EMERALD_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 1
+        max_vein: 8
+        min_spawn_height: 0
+        max_spawn_height: 16
+        odds: '1:1000'
+      GOLD_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 2
+        max_vein: 10
+        min_spawn_height: 0
+        max_spawn_height: 32
+        odds: '1:800'
+      REDSTONE_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 4
+        max_vein: 16
+        min_spawn_height: 0
+        max_spawn_height: 32
+        odds: '1:600'
+      LAPIS_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 4
+        max_vein: 16
+        min_spawn_height: 0
+        max_spawn_height: 32
+        odds: '1:600'
+      IRON_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 4
+        max_vein: 16
+        min_spawn_height: 0
+        max_spawn_height: 32
+        odds: '1:500'
+      COAL_ORE:
+        inside: 'STONE'
+        environment: 'NORMAL'
+        min_vein: 4
+        max_vein: 16
+        min_spawn_height: 0
+        max_spawn_height: 32
+        odds: '1:400'
+      QUARTZ_ORE:
+        inside: 'NETHERRACK'
+        environment: 'NETHER'
+        min_vein: 4
+        max_vein: 16
+        min_spawn_height: 0
+        max_spawn_height: 256
+        odds: '1:600'
+      GLOWSTONE:
+        inside: 'NETHERRACK'
+        environment: 'NETHER'
+        min_vein: 2
+        max_vein: 8
+        min_spawn_height: 0
+        max_spawn_height: 256
+        odds: '1:800'
