@@ -1,5 +1,7 @@
 package com.llewkcor.ares.humbug.cont.mods;
 
+import com.llewkcor.ares.commons.logger.Logger;
+import com.llewkcor.ares.commons.util.bukkit.Scheduler;
 import com.llewkcor.ares.commons.util.general.Configs;
 import com.llewkcor.ares.humbug.Humbug;
 import com.llewkcor.ares.humbug.cont.HumbugMod;
@@ -10,14 +12,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -115,15 +115,24 @@ public final class WorldMod implements HumbugMod, Listener {
     }
 
     @EventHandler
-    public void onBlockForm(BlockFormEvent event) {
+    public void onBlockFromTo(BlockFromToEvent event) {
         if (!isEnabled() || !isCobblestoneGenDisabled()) {
             return;
         }
 
-        final Block block = event.getNewState().getBlock();
+        final Block source = event.getBlock();
+        final Block to = event.getToBlock();
+        final Material mirrorID1 = (source.getType().equals(Material.WATER) || source.getType().equals(Material.STATIONARY_WATER) ? Material.LAVA : Material.WATER);
+        final Material mirrorID2 = (source.getType().equals(Material.WATER) || source.getType().equals(Material.STATIONARY_WATER) ? Material.STATIONARY_LAVA : Material.STATIONARY_WATER);
+        final BlockFace[] faces = new BlockFace[] {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
-        if (block.getType().equals(Material.COBBLESTONE)) {
-            event.setCancelled(true);
+        for (BlockFace face : faces){
+            final Block relative = to.getRelative(face, 1);
+
+            if (relative.getType().equals(mirrorID1) || relative.getType().equals(mirrorID2)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
