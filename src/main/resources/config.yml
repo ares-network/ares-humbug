@@ -1,4 +1,7 @@
 mods:
+  chat:
+    enabled: true
+    hide_join_leave_messages: true
   bots:
     limit_connects: true
     max_conn_per_ip: 2
