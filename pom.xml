@@ -35,6 +35,7 @@
                                 <includes>
                                     <include>co.aikar</include>
                                     <include>net.jodah</include>
+                                    <include>io.netty</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -116,6 +117,13 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>4.5.0</version>
+        </dependency>
+
+        <!-- Netty Buffer Libary -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.48.Final</version>
         </dependency>
 
         <!-- Ares Core -->

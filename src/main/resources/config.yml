@@ -1,4 +1,6 @@
 mods:
+  exploit_fixes:
+    enabled: true
   chat:
     enabled: true
     hide_join_leave_messages: true

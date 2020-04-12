@@ -25,6 +25,7 @@ public final class ModManager {
         mods.add(new MiningMod(plugin));
         mods.add(new BotMod(plugin));
         mods.add(new ChatMod(plugin));
+        mods.add(new ExploitMod(plugin));
     }
 
     public void load() {
