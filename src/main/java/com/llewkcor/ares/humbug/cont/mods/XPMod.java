@@ -13,12 +13,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -33,6 +38,11 @@ public final class XPMod implements HumbugMod, Listener {
     @Getter @Setter public boolean enabled;
     @Getter @Setter public boolean initialized;
 
+    @Getter @Setter public boolean bottleExpEnabled;
+    @Getter @Setter public double baseExpMultiplier;
+    @Getter @Setter public boolean spawnersDisabled;
+    @Getter @Setter public boolean lootingFortuneMultiplierEnabled;
+
     public XPMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
@@ -43,7 +53,11 @@ public final class XPMod implements HumbugMod, Listener {
     public void load() {
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
 
-        this.enabled = config.getBoolean("mods.xp.enabled");
+        this.enabled = true;
+        this.bottleExpEnabled = config.getBoolean("mods.xp.bottle_exp_enabled");
+        this.spawnersDisabled = config.getBoolean("mods.exp.disable_monster_spawners");
+        this.baseExpMultiplier = config.getDouble("mods.xp.exp_base_multiplier");
+        this.lootingFortuneMultiplierEnabled = config.getBoolean("mods.exp.looting_fortune_multiplier_enabled");
 
         if (initialized) {
             return;
@@ -65,7 +79,7 @@ public final class XPMod implements HumbugMod, Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        if (!isEnabled() || event.isCancelled()) {
+        if (!isEnabled() || !isBottleExpEnabled() || event.isCancelled()) {
             return;
         }
 
@@ -116,12 +130,72 @@ public final class XPMod implements HumbugMod, Listener {
     @Override
     public void unload() {}
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!isEnabled() || !isLootingFortuneMultiplierEnabled() || event.isCancelled()) {
+            return;
+        }
+
+        final Player player = event.getPlayer();
+        final ItemStack hand = player.getItemInHand();
+
+        if (hand == null || !hand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+            return;
+        }
+
+        final int enchantMultiplier = hand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+        final int xp = event.getExpToDrop();
+
+        event.setExpToDrop((int)Math.round((xp * (enchantMultiplier * baseExpMultiplier))));
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (!isEnabled() || !isLootingFortuneMultiplierEnabled()) {
+            return;
+        }
+        
+        final LivingEntity entity = event.getEntity();
+        final Player killer = entity.getKiller();
+
+        if (killer == null) {
+            return;
+        }
+
+        final ItemStack hand = killer.getItemInHand();
+
+        if (hand == null || !hand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+            return;
+        }
+
+        final int enchantMultiplier = hand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+        final int xp = event.getDroppedExp();
+
+        event.setDroppedExp((int)Math.round((xp * (enchantMultiplier * baseExpMultiplier))));
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (!isEnabled() || isSpawnersDisabled() || event.isCancelled()) {
+            return;
+        }
+
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER)) {
+            event.setCancelled(true);
+        }
+    }
+
     public final class BottleCommand extends BaseCommand {
         @CommandAlias("bottle")
         @Description("Bottle all of your current EXP")
         public void onBottle(Player player) {
             final int levels = player.getLevel();
             final ItemStack hand = player.getItemInHand();
+
+            if (!isBottleExpEnabled()) {
+                player.sendMessage(ChatColor.RED + "Bottling Experience has been disabled");
+                return;
+            }
 
             if (levels <= 0) {
                 player.sendMessage(ChatColor.RED + "You need at least 1 level to bottle experience");

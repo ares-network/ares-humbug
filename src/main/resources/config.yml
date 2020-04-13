@@ -62,7 +62,10 @@ mods:
     old_strength: true
     old_regen: true
   xp:
-    enabled: true
+    exp_base_multiplier: 2.5
+    disable_monster_spawners: true
+    bottle_exp_enabled: true
+    looting_fortune_multiplier_enabled: true
   mining:
     enabled: true
     findables:
