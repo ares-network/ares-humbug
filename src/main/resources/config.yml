@@ -2,8 +2,10 @@ mods:
   exploit_fixes:
     enabled: true
   chat:
-    enabled: true
     hide_join_leave_messages: true
+    disable_posting_links: true
+    allowed_links:
+      - 'discord'
   bots:
     limit_connects: true
     max_conn_per_ip: 2
