@@ -1,4 +1,6 @@
 mods:
+  armor_durability:
+    enabled: true
   exploit_fixes:
     enabled: true
   chat:
