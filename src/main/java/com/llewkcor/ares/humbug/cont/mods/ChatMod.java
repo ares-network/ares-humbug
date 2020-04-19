@@ -143,6 +143,10 @@ public final class ChatMod implements HumbugMod, Listener {
         final String message = event.getMessage();
         final String[] split = message.split(" ");
 
+        if (player.hasPermission("humbug.chat.bypass")) {
+            return;
+        }
+
         for (String str : split) {
             if (isBlacklistedLink(str)) {
 
