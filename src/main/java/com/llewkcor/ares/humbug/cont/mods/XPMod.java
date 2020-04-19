@@ -197,6 +197,12 @@ public final class XPMod implements HumbugMod, Listener {
                 return;
             }
 
+            if (!player.hasPermission("humbug.exp.bottle")) {
+                player.sendMessage(ChatColor.RED + "This feature is only allowed for premium users.");
+                player.sendMessage(ChatColor.YELLOW + "To bypass this limitation purchase a rank at " + ChatColor.AQUA + "https://playares.com/store");
+                return;
+            }
+
             if (levels <= 0) {
                 player.sendMessage(ChatColor.RED + "You need at least 1 level to bottle experience");
                 return;
