@@ -62,8 +62,8 @@ mods:
     enabled: true
     tag_prefix: '&ax'
     stack_interval: 5
-    max-stack-size: 100
-    breed-cooldown: 30
+    max_stack_size: 100
+    breed_cooldown: 30
     stack_types:
       - 'ZOMBIE'
       - 'SKELETON'

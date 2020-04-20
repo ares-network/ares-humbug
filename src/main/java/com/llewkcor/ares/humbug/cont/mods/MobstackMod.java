@@ -80,7 +80,7 @@ public final class MobstackMod implements HumbugMod, Listener {
 
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
 
-        this.enabled = config.getBoolean("mods.mob-stacking.enabled");
+        this.enabled = config.getBoolean("mods.mob_stacking.enabled");
         this.tagPrefix = ChatColor.translateAlternateColorCodes('&', config.getString("mods.mob_stacking.tag_prefix"));
         this.stackInterval = config.getInt("mods.mob_stacking.stack_interval");
         this.maxStackSize = config.getInt("mods.mob_stacking.max_stack_size");
