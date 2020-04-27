@@ -103,6 +103,11 @@ mods:
     values:
       horizontal: 1.0
       vertical: 1.0
+      movement_modifiers:
+        new_sprint: 0.8
+        sprint: 0.65
+        walk: 0.5
+        air: 1.0
 
   # Enables old potion modifications
   # old_health: Changes health splashes to double

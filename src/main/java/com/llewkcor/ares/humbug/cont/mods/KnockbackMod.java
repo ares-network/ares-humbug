@@ -39,6 +39,10 @@ public final class KnockbackMod implements HumbugMod, Listener {
 
     @Getter @Setter public double horizontal;
     @Getter @Setter public double vertical;
+    @Getter @Setter public double resetSprintModifier;
+    @Getter @Setter public double sprintModifier;
+    @Getter @Setter public double walkModifier;
+    @Getter @Setter public double airModifier;
 
     public KnockbackMod(Humbug plugin) {
         this.plugin = plugin;
@@ -57,6 +61,10 @@ public final class KnockbackMod implements HumbugMod, Listener {
         this.enabled = config.getBoolean("mods.knockback.enabled");
         this.vertical = config.getDouble("mods.knockback.values.vertical");
         this.horizontal = config.getDouble("mods.knockback.values.horizontal");
+        this.resetSprintModifier = config.getDouble("mods.knockback.values.movement_modifiers.new_sprint");
+        this.sprintModifier = config.getDouble("mods.knockback.values.movement_modifiers.sprint");
+        this.walkModifier = config.getDouble("mods.knockback.values.movement_modifiers.walk");
+        this.airModifier = config.getDouble("mods.knockback.values.movement_modifiers.air");
     }
 
     @Override
@@ -133,7 +141,7 @@ public final class KnockbackMod implements HumbugMod, Listener {
 
         final double sprintMultiplier = (damager.isSprinting() ? (hasRecentlySprinted(damager) ? 0.8D : 0.65D) : 0.5D);
         final double enchantMultiplier = (damager.getItemInHand() == null) ? 0 : damager.getItemInHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
-        final double airMultiplier = damaged.isOnGround() ? 1 : 0.5;
+        final double airMultiplier = damaged.isOnGround() ? airModifier : (airModifier / 2);
 
         final Vector velocity = damaged.getLocation().toVector().subtract(damager.getLocation().toVector()).normalize();
 
