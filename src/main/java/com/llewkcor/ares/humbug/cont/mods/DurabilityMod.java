@@ -25,15 +25,13 @@ public final class DurabilityMod implements HumbugMod, Listener {
     public DurabilityMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
     public void load() {
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
-
         this.enabled = config.getBoolean("mods.armor_durability.enabled");
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
