@@ -2,9 +2,11 @@ package com.llewkcor.ares.humbug.cont.mods;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.llewkcor.ares.commons.util.general.Configs;
@@ -12,23 +14,28 @@ import com.llewkcor.ares.humbug.Humbug;
 import com.llewkcor.ares.humbug.cont.HumbugMod;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.List;
+import java.util.Random;
 
 public final class AttributeMod implements HumbugMod, Listener {
     @Getter public final Humbug plugin;
     @Getter public final String name = "Attribute Hider";
     @Getter @Setter public boolean enabled;
+    @Getter public final Random random;
 
     public AttributeMod(Humbug plugin) {
         this.plugin = plugin;
         this.enabled = false;
+        this.random = new Random();
     }
 
     @Override
@@ -38,84 +45,101 @@ public final class AttributeMod implements HumbugMod, Listener {
         }
 
         final YamlConfiguration config = Configs.getConfig(plugin, "config");
-        this.enabled = config.getBoolean("hide_attributes.enabled");
+        this.enabled = config.getBoolean("mods.hide_attributes.enabled");
 
+        // We check twice because it can be disabled in the config from here
+        if (!enabled) {
+            return;
+        }
+
+        //Strips armour
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
             @Override
-            public void onPacketSending(PacketEvent event) {
-                final PacketContainer packet = event.getPacket();
-                final ItemStack item = packet.getItemModifier().read(0);
+            public void onPacketSending(PacketEvent e) {
+                try {
+                    final PacketContainer p = e.getPacket();
+                    final StructureModifier<ItemStack> items = p.getItemModifier();
+                    final ItemStack i = items.read(0);
 
-                if (item == null) {
-                    return;
-                }
+                    if (i != null && isObfuscatable(i.getType())) {
+                        Color color = null;
 
-                if (!isObfuscatable(item.getType())) {
-                    final ItemMeta meta = item.getItemMeta();
+                        if (i.getItemMeta() instanceof LeatherArmorMeta) {
+                            LeatherArmorMeta lam = (LeatherArmorMeta) i.getItemMeta();
+                            color = lam.getColor();
+                        }
 
-                    if (meta != null) {
-                        meta.setLore(null);
-                        meta.setDisplayName(null);
-                        item.setItemMeta(meta);
+                        final ItemStack is = new ItemStack(i.getType(), 1 , (short) 1);
+
+                        if (i.getEnchantments().keySet().size() != 0) {
+                            is.addEnchantment(Enchantment.DURABILITY, 1);
+                        }
+
+                        if (color != null) {
+                            LeatherArmorMeta lam = (LeatherArmorMeta) is.getItemMeta();
+                            lam.setColor(color);
+                            is.setItemMeta(lam);
+                        }
+
+                        items.write(0, is);
                     }
-
-                    packet.getItemModifier().write(0, item);
+                } catch (FieldAccessException exception) {
+                    exception.printStackTrace();
                 }
             }
         });
 
+        //Strips potion duration length and sets it to 420 ticks so you can blaze it
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EFFECT) {
             @Override
-            public void onPacketSending(PacketEvent event) {
-                final PacketContainer packet = event.getPacket();
-                final StructureModifier<Integer> ints = packet.getIntegers();
+            public void onPacketSending(PacketEvent e) {
+                try {
+                    final PacketContainer p = e.getPacket();
 
-                if (event.getPlayer().getEntityId() == ints.read(0)) {
-                    return;
+                    if(e.getPlayer().getEntityId() != p.getIntegers().read(0)) {
+                        p.getIntegers().write(1, 420);
+                    }
+                } catch (FieldAccessException exception) {
+                    exception.printStackTrace();
                 }
-
-                packet.getBytes().write(1, (byte)0);
-                ints.write(1, 0);
             }
         });
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                final PacketContainer packet = event.getPacket();
-                final Player player = event.getPlayer();
-                final Entity entity = packet.getEntityModifier(event).read(0);
-                final StructureModifier<List<WrappedWatchableObject>> modifier = packet.getWatchableCollectionModifier();
-                final List<WrappedWatchableObject> read = modifier.read(0);
+        //Make reported health random
+        ProtocolLibrary.getProtocolManager().addPacketListener(
+                new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_METADATA) {
+                    public void onPacketSending(PacketEvent event) {
+                        try {
+                            final Player observer = event.getPlayer();
 
-                if (
-                        player.getUniqueId().equals(entity.getUniqueId()) ||
-                        !(entity instanceof LivingEntity) ||
-                        entity instanceof EnderDragon ||
-                        entity instanceof Wither ||
-                        entity.getPassenger().equals(player)) {
+                            //Get the entity from the packet
+                            final Entity entity = event.getPacket().getEntityModifier(observer.getWorld()).read(0);
 
-                    return;
+                            event.setPacket(event.getPacket().deepClone());
 
-                }
+                            //If the entity is not the observer, and the entity is alive, and the entity is not a dragon or wither,
+                            //and the entity is not the observer's mount
+                            if ((observer != entity) && ((entity instanceof LivingEntity)) &&
+                                    (!(entity instanceof EnderDragon) && !(entity instanceof Wither)) && (entity.getPassenger() != observer)) {
 
-                for (WrappedWatchableObject obj : read) {
-                    if (obj.getIndex() == 7) {
-                        final float value = (float)obj.getValue();
+                                final StructureModifier<List<WrappedWatchableObject>> watcher = event.getPacket().getWatchableCollectionModifier();
 
-                        if (value > 0) {
-                            obj.setValue(1F);
+                                for (WrappedWatchableObject watch : watcher.read(0)) {
+                                    if ((watch.getIndex() == 6) && ((Float) watch.getValue() > 0.0F)) {
+                                        watch.setValue(20f);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
-                }
-            }
-        });
+                });
     }
 
     @Override
-    public void unload() {
-
-    }
+    public void unload() {}
 
     private boolean isObfuscatable(Material type) {
         return type == Material.DIAMOND_HELMET

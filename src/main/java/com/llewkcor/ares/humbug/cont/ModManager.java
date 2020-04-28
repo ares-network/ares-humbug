@@ -27,6 +27,7 @@ public final class ModManager {
         mods.add(new ChatMod(plugin));
         mods.add(new ExploitMod(plugin));
         mods.add(new DurabilityMod(plugin));
+        mods.add(new AttributeMod(plugin));
     }
 
     public void load() {

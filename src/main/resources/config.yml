@@ -208,7 +208,7 @@ mods:
         max_spawn_height: 256
         odds: '1:800'
 
-# Enabling this mod will send false packets of health, potion effects and armor
-# so cheaters can not see what a player really has
-hide_attributes:
-  enabled: true
+  # Enabling this mod will send false packets of health, potion effects and armor
+  # so cheaters can not see what a player really has
+  hide_attributes:
+    enabled: true
