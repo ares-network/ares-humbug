@@ -1,18 +1,17 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.injector.PacketConstructor;
 import com.google.common.collect.Lists;
-import com.llewkcor.ares.commons.event.PlayerDamagePlayerEvent;
-import com.llewkcor.ares.commons.logger.Logger;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.event.PlayerDamagePlayerEvent;
+import com.playares.commons.logger.Logger;
+import com.playares.commons.util.general.Configs;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class KnockbackMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Knockback";
     @Getter @Setter public boolean enabled;
     @Getter public final List<UUID> recentSprinters;
@@ -44,19 +43,19 @@ public final class KnockbackMod implements HumbugMod, Listener {
     @Getter @Setter public double walkModifier;
     @Getter @Setter public double airModifier;
 
-    public KnockbackMod(Humbug plugin) {
-        this.plugin = plugin;
+    public KnockbackMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.enabled = false;
         this.recentSprinters = Collections.synchronizedList(Lists.newArrayList());
         this.horizontal = 1.0D;
         this.vertical = 1.0D;
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
     public void load() {
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.enabled = config.getBoolean("mods.knockback.enabled");
         this.vertical = config.getDouble("mods.knockback.values.vertical");

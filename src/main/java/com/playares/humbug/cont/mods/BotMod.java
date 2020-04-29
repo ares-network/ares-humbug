@@ -1,10 +1,10 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.google.common.collect.Lists;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.commons.util.general.IPS;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.util.general.Configs;
+import com.playares.commons.util.general.IPS;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -17,22 +17,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class BotMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Bot Protection";
     @Getter @Setter public boolean enabled;
 
     @Getter public boolean limitConnections;
     @Getter public int maxConnectionsPerIP;
 
-    public BotMod(Humbug plugin) {
-        this.plugin = plugin;
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+    public BotMod(HumbugService humbug) {
+        this.humbug = humbug;
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
     public void load() {
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.limitConnections = config.getBoolean("mods.bots.limit_connections");
         this.maxConnectionsPerIP = config.getInt("mods.bots.max_conn_per_ip");

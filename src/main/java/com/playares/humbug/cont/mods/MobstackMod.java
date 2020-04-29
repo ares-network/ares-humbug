@@ -1,14 +1,14 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.llewkcor.ares.commons.util.bukkit.Scheduler;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.commons.util.general.Time;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.util.bukkit.Scheduler;
+import com.playares.commons.util.general.Configs;
+import com.playares.commons.util.general.Time;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class MobstackMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Mob Stacking";
     @Getter @Setter public boolean enabled;
     @Getter @Setter public String tagPrefix;
@@ -55,12 +55,12 @@ public final class MobstackMod implements HumbugMod, Listener {
             .put(EntityType.RABBIT, ImmutableList.of(Material.YELLOW_FLOWER, Material.CARROT_ITEM, Material.CARROT, Material.GOLDEN_CARROT))
             .build();
 
-    public MobstackMod(Humbug plugin) {
-        this.plugin = plugin;
+    public MobstackMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.stackSkip = Collections.synchronizedList(Lists.newArrayList());
         this.breedCooldowns = Maps.newConcurrentMap();
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class MobstackMod implements HumbugMod, Listener {
             stackTask = null;
         }
 
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(getHumbug().getOwner(), "humbug");
 
         this.enabled = config.getBoolean("mods.mob_stacking.enabled");
         this.tagPrefix = ChatColor.translateAlternateColorCodes('&', config.getString("mods.mob_stacking.tag_prefix"));
@@ -87,7 +87,7 @@ public final class MobstackMod implements HumbugMod, Listener {
         this.breedCooldown = config.getInt("mods.mob_stacking.breed_cooldown");
         this.stackTypes = config.getStringList("mods.mob_stacking.stack_types");
 
-        this.stackTask = new Scheduler(plugin).sync(() -> {
+        this.stackTask = new Scheduler(getHumbug().getOwner()).sync(() -> {
             for (World world : Bukkit.getWorlds()) {
                 for (LivingEntity entity : world.getLivingEntities()) {
                     if (!stackTypes.contains(entity.getType().name())) {
@@ -361,6 +361,6 @@ public final class MobstackMod implements HumbugMod, Listener {
         }
 
         breedCooldowns.put(player.getUniqueId(), (Time.now() + (breedCooldown * 1000L)));
-        new Scheduler(plugin).sync(() -> breedCooldowns.remove(uniqueId)).delay(breedCooldown * 20L).run();
+        new Scheduler(humbug.getOwner()).sync(() -> breedCooldowns.remove(uniqueId)).delay(breedCooldown * 20L).run();
     }
 }

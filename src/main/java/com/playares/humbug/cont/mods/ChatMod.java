@@ -1,15 +1,14 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.google.common.collect.Maps;
-import com.llewkcor.ares.commons.event.ProcessedChatEvent;
-import com.llewkcor.ares.commons.util.bukkit.Scheduler;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.commons.util.general.Time;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.event.ProcessedChatEvent;
+import com.playares.commons.util.bukkit.Scheduler;
+import com.playares.commons.util.general.Configs;
+import com.playares.commons.util.general.Time;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -27,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class ChatMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Chat";
     @Getter @Setter public boolean enabled;
 
@@ -39,17 +38,17 @@ public final class ChatMod implements HumbugMod, Listener {
     @Getter public boolean rateLimitChatEnabled;
     @Getter public int chatRateLimit;
 
-    public ChatMod(Humbug plugin) {
-        this.plugin = plugin;
+    public ChatMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.enabled = false;
         this.recentChatters = Maps.newConcurrentMap();
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
     public void load() {
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.hideJoinLeaveMessages = config.getBoolean("mods.chat.hide_join_leave_messages");
         this.disablePostingLinks = config.getBoolean("mods.chat.disable_posting_links");
@@ -185,6 +184,6 @@ public final class ChatMod implements HumbugMod, Listener {
         final long nextAllowedMessage = (Time.now() + (chatRateLimit * 1000L));
 
         recentChatters.put(player.getUniqueId(), nextAllowedMessage);
-        new Scheduler(plugin).async(() -> recentChatters.remove(uniqueId)).delay(chatRateLimit * 20L).run();
+        new Scheduler(humbug.getOwner()).async(() -> recentChatters.remove(uniqueId)).delay(chatRateLimit * 20L).run();
     }
 }

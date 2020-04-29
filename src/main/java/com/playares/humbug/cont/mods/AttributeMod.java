@@ -1,7 +1,6 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -9,9 +8,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.FieldAccessException;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.util.general.Configs;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Color;
@@ -27,13 +26,13 @@ import java.util.List;
 import java.util.Random;
 
 public final class AttributeMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Attribute Hider";
     @Getter @Setter public boolean enabled;
     @Getter public final Random random;
 
-    public AttributeMod(Humbug plugin) {
-        this.plugin = plugin;
+    public AttributeMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.enabled = false;
         this.random = new Random();
     }
@@ -44,7 +43,7 @@ public final class AttributeMod implements HumbugMod, Listener {
             return;
         }
 
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
         this.enabled = config.getBoolean("mods.hide_attributes.enabled");
 
         // We check twice because it can be disabled in the config from here
@@ -53,7 +52,7 @@ public final class AttributeMod implements HumbugMod, Listener {
         }
 
         //Strips armour
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
+        humbug.getOwner().getProtocolManager().addPacketListener(new PacketAdapter(humbug.getOwner(), PacketType.Play.Server.ENTITY_EQUIPMENT) {
             @Override
             public void onPacketSending(PacketEvent e) {
                 try {
@@ -90,7 +89,7 @@ public final class AttributeMod implements HumbugMod, Listener {
         });
 
         //Strips potion duration length and sets it to 420 ticks so you can blaze it
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EFFECT) {
+        humbug.getOwner().getProtocolManager().addPacketListener(new PacketAdapter(humbug.getOwner(), PacketType.Play.Server.ENTITY_EFFECT) {
             @Override
             public void onPacketSending(PacketEvent e) {
                 try {
@@ -106,8 +105,8 @@ public final class AttributeMod implements HumbugMod, Listener {
         });
 
         //Make reported health random
-        ProtocolLibrary.getProtocolManager().addPacketListener(
-                new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_METADATA) {
+        humbug.getOwner().getProtocolManager().addPacketListener(
+                new PacketAdapter(humbug.getOwner(), ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_METADATA) {
                     public void onPacketSending(PacketEvent event) {
                         try {
                             final Player observer = event.getPlayer();

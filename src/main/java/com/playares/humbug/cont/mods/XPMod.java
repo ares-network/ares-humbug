@@ -1,15 +1,14 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Description;
-import com.llewkcor.ares.commons.item.ItemBuilder;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.item.ItemBuilder;
+import com.playares.commons.util.general.Configs;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,7 +32,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import java.util.List;
 
 public final class XPMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Experience";
     @Getter @Setter public boolean enabled;
     @Getter @Setter public boolean initialized;
@@ -43,15 +42,15 @@ public final class XPMod implements HumbugMod, Listener {
     @Getter @Setter public boolean spawnersDisabled;
     @Getter @Setter public boolean lootingFortuneMultiplierEnabled;
 
-    public XPMod(Humbug plugin) {
-        this.plugin = plugin;
+    public XPMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.enabled = false;
         this.initialized = false;
     }
 
     @Override
     public void load() {
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.enabled = true;
         this.bottleExpEnabled = config.getBoolean("mods.xp.bottle_exp_enabled");
@@ -69,10 +68,9 @@ public final class XPMod implements HumbugMod, Listener {
         recipe.shape("*");
         recipe.setIngredient('*', Material.EMERALD);
 
-        plugin.getServer().addRecipe(recipe);
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-        plugin.getCommandManager().registerCommand(new BottleCommand());
+        humbug.getOwner().getServer().addRecipe(recipe);
+        humbug.getOwner().registerListener(this);
+        humbug.getOwner().registerCommand(new BottleCommand());
 
         this.initialized = true;
     }

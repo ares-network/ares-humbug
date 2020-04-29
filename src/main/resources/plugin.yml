@@ -1,5 +1,0 @@
-name: ares-humbug
-main: com.llewkcor.ares.humbug.Humbug
-version: 1.0.0
-author: John Rockwell
-depends: [ares-core]

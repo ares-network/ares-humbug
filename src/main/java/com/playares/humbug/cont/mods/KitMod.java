@@ -1,18 +1,17 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.llewkcor.ares.commons.event.PlayerDamagePlayerEvent;
-import com.llewkcor.ares.commons.logger.Logger;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.event.PlayerDamagePlayerEvent;
+import com.playares.commons.logger.Logger;
+import com.playares.commons.util.general.Configs;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,18 +31,18 @@ import java.util.Map;
 import java.util.Set;
 
 public final class KitMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Kit";
     @Getter @Setter public boolean enabled;
     @Getter public final Set<PotionLimit> potionLimits;
     @Getter public final Set<EnchantLimit> enchantLimits;
 
-    public KitMod(Humbug plugin) {
-        this.plugin = plugin;
+    public KitMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.potionLimits = Sets.newHashSet();
         this.enchantLimits = Sets.newHashSet();
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        humbug.getOwner().registerListener(this);
     }
 
     @SuppressWarnings("unchecked") @Override
@@ -56,7 +55,7 @@ public final class KitMod implements HumbugMod, Listener {
             potionLimits.clear();
         }
 
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.enabled = config.getBoolean("mods.kit-limits.enabled");
 

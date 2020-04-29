@@ -1,17 +1,17 @@
-package com.llewkcor.ares.humbug.cont;
+package com.playares.humbug.cont;
 
 import com.google.common.collect.Sets;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.mods.*;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.mods.*;
 import lombok.Getter;
 
 import java.util.Set;
 
 public final class ModManager {
-    @Getter public Humbug plugin;
+    @Getter public HumbugService plugin;
     @Getter public Set<HumbugMod> mods;
 
-    public ModManager(Humbug plugin) {
+    public ModManager(HumbugService plugin) {
         this.plugin = plugin;
         this.mods = Sets.newConcurrentHashSet();
 

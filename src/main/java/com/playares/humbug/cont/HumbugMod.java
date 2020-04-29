@@ -1,13 +1,13 @@
-package com.llewkcor.ares.humbug.cont;
+package com.playares.humbug.cont;
 
-import com.llewkcor.ares.humbug.Humbug;
+import com.playares.humbug.HumbugService;
 
 public interface HumbugMod {
     /**
      * Returns the Humbug plugin instance
      * @return Humbug
      */
-    Humbug getPlugin();
+    HumbugService getHumbug();
 
     /**
      * Returns the name of this Humbug Module

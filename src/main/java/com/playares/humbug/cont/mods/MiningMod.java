@@ -1,17 +1,16 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.llewkcor.ares.commons.location.BLocatable;
-import com.llewkcor.ares.commons.logger.Logger;
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.location.BLocatable;
+import com.playares.commons.logger.Logger;
+import com.playares.commons.util.general.Configs;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -29,7 +28,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public final class MiningMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Mining";
     @Getter @Setter public boolean enabled;
 
@@ -37,13 +36,13 @@ public final class MiningMod implements HumbugMod, Listener {
     @Getter public final List<BLocatable> placedStone;
     @Getter public final Random random;
 
-    public MiningMod(Humbug plugin) {
-        this.plugin = plugin;
+    public MiningMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.findables = Lists.newArrayList();
         this.placedStone = Lists.newArrayList();
         this.random = new Random();
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
@@ -52,7 +51,7 @@ public final class MiningMod implements HumbugMod, Listener {
             findables.clear();
         }
 
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
 
         this.enabled = config.getBoolean("mods.mining.enabled");
 

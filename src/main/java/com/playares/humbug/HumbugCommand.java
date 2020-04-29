@@ -1,4 +1,4 @@
-package com.llewkcor.ares.humbug;
+package com.playares.humbug;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 @AllArgsConstructor
 @CommandAlias("humbug|hb")
 public final class HumbugCommand extends BaseCommand {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService plugin;
 
     @Subcommand("reload")
     @CommandPermission("humbug.reload")

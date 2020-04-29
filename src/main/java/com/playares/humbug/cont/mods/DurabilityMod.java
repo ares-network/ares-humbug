@@ -1,11 +1,10 @@
-package com.llewkcor.ares.humbug.cont.mods;
+package com.playares.humbug.cont.mods;
 
-import com.llewkcor.ares.commons.util.general.Configs;
-import com.llewkcor.ares.humbug.Humbug;
-import com.llewkcor.ares.humbug.cont.HumbugMod;
+import com.playares.humbug.HumbugService;
+import com.playares.humbug.cont.HumbugMod;
+import com.playares.commons.util.general.Configs;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -18,19 +17,21 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 public final class DurabilityMod implements HumbugMod, Listener {
-    @Getter public final Humbug plugin;
+    @Getter public final HumbugService humbug;
     @Getter public final String name = "Durability";
     @Getter @Setter public boolean enabled;
 
-    public DurabilityMod(Humbug plugin) {
-        this.plugin = plugin;
+    public DurabilityMod(HumbugService humbug) {
+        this.humbug = humbug;
         this.enabled = false;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+
+        humbug.getOwner().registerListener(this);
     }
 
     @Override
     public void load() {
-        final YamlConfiguration config = Configs.getConfig(plugin, "config");
+        final YamlConfiguration config = Configs.getConfig(humbug.getOwner(), "humbug");
+
         this.enabled = config.getBoolean("mods.armor_durability.enabled");
     }
 

@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.llewkcor</groupId>
+    <groupId>com.playares</groupId>
     <artifactId>ares-humbug</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <build>
         <plugins>
@@ -124,14 +124,6 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
             <version>4.1.48.Final</version>
-        </dependency>
-
-        <!-- Ares Core -->
-        <dependency>
-            <groupId>com.llewkcor</groupId>
-            <artifactId>ares-core</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
