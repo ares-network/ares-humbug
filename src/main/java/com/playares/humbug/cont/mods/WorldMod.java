@@ -1,5 +1,6 @@
 package com.playares.humbug.cont.mods;
 
+import com.playares.commons.logger.Logger;
 import com.playares.humbug.HumbugService;
 import com.playares.humbug.cont.HumbugMod;
 import com.playares.commons.util.general.Configs;
@@ -11,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,8 +33,8 @@ public final class WorldMod implements HumbugMod, Listener {
     @Getter public boolean enderchestDisabled;
     @Getter public boolean blockExplosionsDisabled;
     @Getter public boolean entityBlockChangesDisabled;
-    @Getter public boolean firespreadDisabled;
     @Getter public boolean cobblestoneGenDisabled;
+    @Getter public boolean firespreadDisabled;
     @Getter public boolean bedbombDisabled;
 
     public WorldMod(HumbugService humbug) {
@@ -51,8 +53,8 @@ public final class WorldMod implements HumbugMod, Listener {
         this.enderchestDisabled = config.getBoolean("mods.world.disable_enderchests");
         this.blockExplosionsDisabled = config.getBoolean("mods.world.disable_block_explosions");
         this.entityBlockChangesDisabled = config.getBoolean("mods.world.disable_entity_block_changes");
-        this.firespreadDisabled = config.getBoolean("mods.world.disable_fire_spread");
         this.cobblestoneGenDisabled = config.getBoolean("mods.world.disable_cobblestone_generators");
+        this.firespreadDisabled = config.getBoolean("mods.world.disable_fire_spread");
         this.bedbombDisabled = config.getBoolean("mods.world.disable_bedbombs");
 
         this.enabled = true;
@@ -103,16 +105,8 @@ public final class WorldMod implements HumbugMod, Listener {
             return;
         }
 
-        event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onFireSpread(BlockSpreadEvent event) {
-        if (!isEnabled() || !isFireSpreadDisabled()) {
-            return;
-        }
-
-        if (!event.getSource().getType().equals(Material.FIRE)) {
+        // Fixes the invisible falling blocks bug
+        if (event.getEntity() instanceof FallingBlock) {
             return;
         }
 
@@ -129,7 +123,7 @@ public final class WorldMod implements HumbugMod, Listener {
         final Block to = event.getToBlock();
         final Material mirrorID1 = (source.getType().equals(Material.WATER) || source.getType().equals(Material.STATIONARY_WATER) ? Material.LAVA : Material.WATER);
         final Material mirrorID2 = (source.getType().equals(Material.WATER) || source.getType().equals(Material.STATIONARY_WATER) ? Material.STATIONARY_LAVA : Material.STATIONARY_WATER);
-        final BlockFace[] faces = new BlockFace[] {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+        final BlockFace[] faces = new BlockFace[] { BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
         for (BlockFace face : faces){
             final Block relative = to.getRelative(face, 1);
@@ -139,6 +133,19 @@ public final class WorldMod implements HumbugMod, Listener {
                 return;
             }
         }
+    }
+
+    @EventHandler
+    public void onFireSpread(BlockSpreadEvent event) {
+        if (!isEnabled() || !isFireSpreadDisabled()) {
+            return;
+        }
+
+        if (!event.getSource().getType().equals(Material.FIRE)) {
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
     @EventHandler

@@ -46,7 +46,7 @@ mods:
     disable_block_explosions: true
     disable_entity_block_changes: true
     fire_spread: true
-    disable_cobblestone_generators: false
+    disable_cobblestone_generators: true
     bedbombs: true
 
   # Toggle minecart elevators
