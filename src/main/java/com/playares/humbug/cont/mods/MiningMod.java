@@ -164,13 +164,13 @@ public final class MiningMod implements HumbugMod, Listener {
         final FoundOreEvent event = new FoundOreEvent(findable, blocks);
         Bukkit.getPluginManager().callEvent(event);
 
-        if (event.isCancelled()) {
+        if (event.isCancelled() || event.getBlocks().isEmpty()) {
             return false;
         }
 
         player.sendMessage(ChatColor.GOLD + " * " + ChatColor.GRAY + "You found " + ChatColor.GOLD + "x" + findables.size() + " " + findable.getColor() + findable.getName() + " " + ChatColor.GRAY + "nearby");
 
-        blocks.forEach(b -> {
+        event.getBlocks().forEach(b -> {
             Players.playSound(player, Sound.DIG_STONE);
             Players.spawnEffect(player, b.getLocation(), Effect.PARTICLE_SMOKE, 25, 5);
             b.setType(findable.getMaterial());
