@@ -168,7 +168,7 @@ public final class MiningMod implements HumbugMod, Listener {
             return false;
         }
 
-        player.sendMessage(ChatColor.GOLD + " * " + ChatColor.GRAY + "You found " + ChatColor.GOLD + "x" + findables.size() + " " + findable.getColor() + findable.getName() + " " + ChatColor.GRAY + "nearby");
+        player.sendMessage(ChatColor.GOLD + " * " + ChatColor.GRAY + "You found " + ChatColor.GOLD + "x" + event.getBlocks().size() + " " + findable.getColor() + findable.getName() + " " + ChatColor.GRAY + "nearby");
 
         event.getBlocks().forEach(b -> {
             Players.playSound(player, Sound.DIG_STONE);
