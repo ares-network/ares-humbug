@@ -100,6 +100,11 @@ public final class MiningMod implements HumbugMod, Listener {
         return ImmutableList.copyOf(findables.stream().filter(findable -> findable.isObtainable(block)).collect(Collectors.toList()));
     }
 
+    /**
+     * Runs a simulation to see if any ores can be spawned for the player at the provided block
+     * @param player Player
+     * @param block Bukkit Block
+     */
     public void run(Player player, Block block) {
         final List<Findable> possibilities = getPossibleFinds(block);
 
