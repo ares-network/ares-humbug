@@ -122,13 +122,17 @@ mods:
     old_regen: true
 
   # EXP Modifications
-  # exp_base_multiplier: When a player is using looting or fortune, we apply a base multiplier to their EXP drops
-  # disable_monster_spawners: Disables monster spawners from spawning mobs
-  # bottle_exp_enabled: Allows premium users to bottle EXP
-  # looting_fortune_multiplier_enabled: Enabled the exp_base_multiplier to work
+  # exp_base_multiplier: Multiplier applied to all EXP events
+  # monster_spawners.prevent_breaking_whitelisted_spawners: Prevent spawners that are whitelisted from being broken
+  # monster_spawners.whitelisted_spawners: Whitelist for Monster Spawners
+  # bottle_exp_enabled: Enables Bottled EXP
+  # looting_fortune_multiplier_enabled: Enables a bonus EXP multiplier for looting and fortune enchantments
   xp:
     exp_base_multiplier: 2.5
-    disable_monster_spawners: true
+    monster_spawners:
+      prevent_breaking_whitelisted_spawners: true
+      whitelisted_spawners:
+        - 'BLAZE'
     bottle_exp_enabled: true
     looting_fortune_multiplier_enabled: true
 

@@ -11,7 +11,6 @@ import com.playares.commons.item.ItemBuilder;
 import com.playares.commons.util.general.Configs;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,11 +38,11 @@ public final class XPMod implements HumbugMod, Listener {
     @Getter @Setter public boolean enabled;
     @Getter @Setter public boolean initialized;
 
-    @Getter @Setter public boolean bottleExpEnabled;
     @Getter @Setter public double baseExpMultiplier;
+    @Getter @Setter public boolean bottleExpEnabled;
     @Getter @Setter public boolean lootingFortuneMultiplierEnabled;
-    @Getter @Setter public boolean spawnersDisabled;
-    @Getter public List<EntityType> whitelistedSpawnerTypes;
+    @Getter @Setter public boolean preventBreakingWhitelistedSpawnersEnabled;
+    @Getter public List<String> whitelistedSpawnerTypes;
 
     public XPMod(HumbugService humbug) {
         this.humbug = humbug;
@@ -59,21 +58,8 @@ public final class XPMod implements HumbugMod, Listener {
         this.bottleExpEnabled = config.getBoolean("mods.xp.bottle_exp_enabled");
         this.baseExpMultiplier = config.getDouble("mods.xp.exp_base_multiplier");
         this.lootingFortuneMultiplierEnabled = config.getBoolean("mods.xp.looting_fortune_multiplier_enabled");
-        this.spawnersDisabled = config.getBoolean("mods.xp.disable_monster_spawners");
-        this.whitelistedSpawnerTypes = Lists.newArrayList();
-
-        for (String spawnerTypeName : config.getStringList("mods.xp.disabled_monster_spawners.whitelisted-spawners")) {
-            final EntityType type;
-
-            try {
-                type = EntityType.valueOf(spawnerTypeName);
-            } catch (IllegalArgumentException ex) {
-                Logger.error("Invalid whitelisted mob spawner type: " + spawnerTypeName);
-                continue;
-            }
-
-            whitelistedSpawnerTypes.add(type);
-        }
+        this.preventBreakingWhitelistedSpawnersEnabled = config.getBoolean("mods.xp.monster_spawners.prevent_breaking_whitelisted_spawners");
+        this.whitelistedSpawnerTypes = config.getStringList("mods.xp.monster_spawners.whitelisted_spawners");
 
         if (initialized) {
             return;
@@ -191,12 +177,12 @@ public final class XPMod implements HumbugMod, Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (!isEnabled() || !isSpawnersDisabled() || event.isCancelled()) {
+        if (!isEnabled() || event.isCancelled()) {
             return;
         }
 
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !whitelistedSpawnerTypes.contains(event.getEntityType())) {
+                !whitelistedSpawnerTypes.contains(event.getEntityType().name())) {
 
             event.setCancelled(true);
 
@@ -205,7 +191,7 @@ public final class XPMod implements HumbugMod, Listener {
 
     @EventHandler
     public void onSpawnerBreak(BlockBreakEvent event) {
-        if (!isEnabled() || !isSpawnersDisabled() || event.isCancelled()) {
+        if (!isEnabled() || !isPreventBreakingWhitelistedSpawnersEnabled() || event.isCancelled()) {
             return;
         }
 
@@ -215,9 +201,9 @@ public final class XPMod implements HumbugMod, Listener {
             return;
         }
 
-        final CreatureSpawner spawner = (CreatureSpawner)block;
+        final CreatureSpawner spawner = (CreatureSpawner)block.getState();
 
-        if (whitelistedSpawnerTypes.contains(spawner.getSpawnedType())) {
+        if (whitelistedSpawnerTypes.contains(spawner.getSpawnedType().name()) && !event.getPlayer().hasPermission("humbug.bypass")) {
             event.getPlayer().sendMessage(ChatColor.RED + "This type of monster spawner can not be broken");
             event.setCancelled(true);
         }
@@ -256,21 +242,22 @@ public final class XPMod implements HumbugMod, Listener {
                     .addLore(ChatColor.DARK_PURPLE + "" + levels + " exp")
                     .build();
 
-            if (player.getInventory().firstEmpty() == -1) {
-                player.getWorld().dropItem(player.getLocation(), item);
-                player.sendMessage(ChatColor.RED + "The Experience Bottle was dropped at your feet because your inventory is full");
-                return;
-            }
-
             if (hand.getAmount() <= 1) {
                 player.getInventory().removeItem(hand);
             } else {
                 hand.setAmount(hand.getAmount() - 1);
             }
 
-            player.getInventory().addItem(item);
+            player.updateInventory();
             player.setLevel(0);
             player.sendMessage(ChatColor.GREEN + "You have bottled " + levels + " levels of Experience");
+
+            if (player.getInventory().firstEmpty() == -1) {
+                player.getWorld().dropItem(player.getLocation(), item);
+                player.sendMessage(ChatColor.RED + "The Experience Bottle has dropped at your feet because your inventory is full");
+            } else {
+                player.getInventory().addItem(item);
+            }
         }
     }
 }
